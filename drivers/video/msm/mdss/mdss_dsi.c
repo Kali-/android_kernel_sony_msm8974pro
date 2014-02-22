@@ -1229,62 +1229,8 @@ static int __devexit mdss_dsi_ctrl_remove(struct platform_device *pdev)
 		pr_err("%s: failed to de-init vregs\n", __func__);
 	mdss_dsi_put_dt_vreg_data(&pdev->dev, &ctrl_pdata->power_data);
 	mfd = platform_get_drvdata(pdev);
-	msm_dss_iounmap(&ctrl_pdata->mmss_misc_io);
 	return 0;
 }
-
-#ifdef CONFIG_FB_MSM_MDSS_SPECIFIC_PANEL
-int mdss_dsi_panel_power_detect(struct platform_device *pdev, int enable)
-{
-	int ret;
-	static struct regulator *vdd_vreg;
-
-	pr_debug("%s: enable=%d\n", __func__, enable);
-	if (!vdd_vreg) {
-		vdd_vreg = devm_regulator_get(&pdev->dev, "vdd");
-		if (IS_ERR(vdd_vreg)) {
-			pr_err("could not get 8941_lvs3, rc = %ld\n",
-					PTR_ERR(vdd_vreg));
-			return -ENODEV;
-		}
-	}
-
-	if (enable) {
-		ret = regulator_set_optimum_mode(vdd_vreg, 100000);
-		if (ret < 0) {
-			pr_err("%s: vdd_vreg set regulator mode failed.\n",
-						       __func__);
-			return ret;
-		}
-
-		ret = regulator_enable(vdd_vreg);
-		if (ret) {
-			pr_err("%s: Failed to enable regulator.\n", __func__);
-			return ret;
-		}
-
-		msleep(50);
-		wmb();
-	} else {
-		ret = regulator_disable(vdd_vreg);
-		if (ret) {
-			pr_err("%s: Failed to disable regulator.\n", __func__);
-			return ret;
-		}
-
-		ret = regulator_set_optimum_mode(vdd_vreg, 100);
-		if (ret < 0) {
-			pr_err("%s: vdd_vreg set regulator mode failed.\n",
-						       __func__);
-			return ret;
-		}
-
-		msleep(20);
-		devm_regulator_put(vdd_vreg);
-	}
-	return 0;
-}
-#endif	/* CONFIG_FB_MSM_MDSS_SPECIFIC_PANEL */
 
 struct device dsi_dev;
 
