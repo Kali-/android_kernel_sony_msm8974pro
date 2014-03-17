@@ -348,6 +348,16 @@ static void mdss_dsi_panel_bl_ctrl(struct mdss_panel_data *pdata,
 		break;
 	case BL_DCS_CMD:
 		mdss_dsi_panel_bklt_dcs(ctrl_pdata, bl_level);
+		if (mdss_dsi_is_master_ctrl(ctrl_pdata)) {
+			struct mdss_dsi_ctrl_pdata *sctrl =
+				mdss_dsi_get_slave_ctrl();
+			if (!sctrl) {
+				pr_err("%s: Invalid slave ctrl data\n",
+					__func__);
+				return;
+			}
+			mdss_dsi_panel_bklt_dcs(sctrl, bl_level);
+		}
 		break;
 	default:
 		pr_err("%s: Unknown bl_ctrl configuration\n",
