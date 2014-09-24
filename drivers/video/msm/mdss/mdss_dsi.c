@@ -131,7 +131,7 @@ static int mdss_dsi_get_dt_vreg_data(struct device *dev,
 	if (!dev || !mp) {
 		pr_err("%s: invalid input\n", __func__);
 		rc = -EINVAL;
-		return rc;
+		goto error;
 	}
 
 	of_node = dev->of_node;
@@ -813,10 +813,11 @@ static int mdss_dsi_blank(struct mdss_panel_data *pdata)
 				__func__, ret);
 			return ret;
 		}
+	}
 	if (pdata->panel_info.type == MIPI_VIDEO_PANEL &&
 			ctrl_pdata->off_cmds.link_state == DSI_LP_MODE) {
 		mdss_dsi_sw_reset(pdata);
-		mdss_dsi_host_init(mipi, pdata);
+		mdss_dsi_host_init(pdata);
 	}
 
 	mdss_dsi_op_mode_config(DSI_CMD_MODE, pdata);
