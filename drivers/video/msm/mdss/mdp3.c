@@ -25,6 +25,7 @@
 #include <linux/of_address.h>
 #include <linux/pm_runtime.h>
 #include <linux/regulator/consumer.h>
+#include <linux/memory_alloc.h>
 #include <linux/module.h>
 #include <linux/mutex.h>
 #include <linux/sched.h>
@@ -2248,7 +2249,7 @@ int mdp3_panel_get_boot_cfg(void)
 
 	if (!mdp3_res || !mdp3_res->pan_cfg.init_done)
 		rc = -EPROBE_DEFER;
-	else if (mdp3_res->pan_cfg.lk_cfg)
+	if (mdp3_res->pan_cfg.lk_cfg)
 		rc = 1;
 	else
 		rc = 0;

@@ -726,11 +726,16 @@ int mdss_dsi_on(struct mdss_panel_data *pdata)
 	 * Issue hardware reset line after enabling the DSI clocks and data
 	 * data lanes for LP11 init
 	 */
-	if (mipi->lp11_init)
-		mdss_dsi_panel_reset(pdata, 1);
-
-	if (mipi->init_delay)
-		usleep(mipi->init_delay);
+	if (pdata->panel_info.mipi.lp11_init) {
+		ret = mdss_dsi_panel_reset(pdata, 1);
+		if (ret) {
+			pr_err("%s: Panel reset failed. rc=%d\n",
+					__func__, ret);
+			return ret;
+		}
+	}
+	if (pdata->panel_info.mipi.init_delay)
+		usleep(pdata->panel_info.mipi.init_delay);
 
 	if (mipi->force_clk_lane_hs) {
 		u32 tmp;
@@ -813,7 +818,7 @@ static int mdss_dsi_blank(struct mdss_panel_data *pdata)
 				__func__, ret);
 			return ret;
 		}
-	}
+        }
 	if (pdata->panel_info.type == MIPI_VIDEO_PANEL &&
 			ctrl_pdata->off_cmds.link_state == DSI_LP_MODE) {
 		mdss_dsi_sw_reset(pdata);
